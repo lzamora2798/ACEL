@@ -7,6 +7,8 @@
 
 double AcX,AcY,AcZ;
 int Pitch, Roll;
+
+double valorX,valorY;
 void init_MPU(){
   Wire.begin();
   Wire.beginTransmission(MPU);
@@ -24,6 +26,20 @@ void FunctionsMPU(){
   AcX=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)     
   AcY=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   AcZ=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  valorX = FunctionsPitchRoll(AcX, AcZ, AcY);  
+  valorY = FunctionsPitchRoll(AcY, AcX, AcZ); 
+}
+
+double FunctionsPitchRoll(double A, double B, double C){
+  double DatoA, DatoB, Value;
+  DatoA = A;
+  DatoB = (B*B) + (C*C);
+  DatoB = sqrt(DatoB);
+  
+  Value = atan2(DatoA, DatoB);
+  Value = Value * 180/3.14;
+  
+  return (int)Value;
 }
 
 void setup(){
@@ -34,8 +50,9 @@ void setup(){
 void loop() {
   // put your main code here, to run repeatedly:
   FunctionsMPU();
-  Serial.print(AcX);
+  
+  Serial.print(valorX);
   Serial.print(" ");
-  Serial.println(AcY);
+  Serial.println(valorY);
   delay(1000);
 }

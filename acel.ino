@@ -1,9 +1,13 @@
 
 #include <SPI.h>
 #include <Wire.h>
+#include <Servo.h>
 
 #define MPU 0x68  // Direccion I2C del MPU-6050
 
+Servo derecha;
+Servo izquierda;
+Servo base;
 
 double AcX,AcY,AcZ;
 int Pitch, Roll;
@@ -42,17 +46,31 @@ double FunctionsPitchRoll(double A, double B, double C){
   return (int)Value;
 }
 
-void setup(){
-  Serial.begin(9600);
-  init_MPU(); // Inicializamos el MPU6050
-}
+    void setup(){
+      Serial.begin(9600);
+      init_MPU(); // Inicializamos el MPU6050
+      derecha.attach(11);
+      izquierda.attach(10);
+      base.attach(5);
+    }
 
 void loop() {
   // put your main code here, to run repeatedly:
   FunctionsMPU();
-  
-  Serial.print(valorX);
-  Serial.print(" ");
-  Serial.println(valorY);
-  delay(1000);
+  //Serial.print(valorX);
+  //Serial.print(" ");
+  //Serial.println(valorY);
+  valorX = map(valorX,-90,90,70,130);
+  valorY = map(valorY,-90,90,70,130);
+  int LDR = analogRead(A0);
+  Serial.println(LDR);
+  //derecha.write(valorX);
+  //izquierda.write(valorY);
+  delay(100);
+  if(LDR < 500){
+    base.write(90);
+  }
+  if(LDR > 800){
+    base.write(140);
+  }
 }
